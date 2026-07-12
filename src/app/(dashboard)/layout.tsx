@@ -1,3 +1,6 @@
+// todo: dashboard layout
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 import React from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 import Navbar from '@/components/layout/Navbar';
