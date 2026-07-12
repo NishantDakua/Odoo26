@@ -36,6 +36,7 @@ enum VehicleStatus {
   ON_TRIP
   IN_SHOP
   RETIRED
+  STANDBY
 }
 
 enum DriverStatus {
@@ -145,6 +146,7 @@ model Trip {
   driverId           String?
   cargoWeightKg      Float
   plannedDistanceKm  Float
+  startOdometerKm    Float?
   actualDistanceKm   Float?
   finalOdometerKm    Float?
   fuelConsumedLiters Float?
