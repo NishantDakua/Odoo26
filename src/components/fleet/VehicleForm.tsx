@@ -10,40 +10,13 @@ type VehicleFormProps = {
   error?: string | null;
 };
 
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontSize: "12px",
-  fontWeight: 500,
-  color: "rgba(255,255,255,0.45)",
-  marginBottom: "6px",
-  letterSpacing: "0.02em",
-  textTransform: "uppercase",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "8px 11px",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: "8px",
-  color: "#e2e8f0",
-  fontSize: "13px",
-  outline: "none",
-  boxSizing: "border-box",
-  transition: "border-color 0.15s",
-};
-
-const disabledInputStyle: React.CSSProperties = {
-  ...inputStyle,
-  opacity: 0.45,
-  cursor: "not-allowed",
-};
-
 const TYPE_LABELS: Record<VehicleType, string> = {
   VAN: "Van",
   TRUCK: "Truck",
   MINI: "Mini",
   OTHER: "Other",
+  BUS: "Bus",
+  MINIBUS: "Minibus",
 };
 
 type FormData = Omit<Partial<Vehicle>, 'acquisitionCost'> & { acquisitionCost?: number | string };
@@ -95,19 +68,17 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
   };
 
   return (
-    <div className="app-card">
-      <div className="app-card-header">
-        <h3 className="section-title">
-          {vehicleToEdit ? "Edit Vehicle" : "Register New Vehicle"}
-        </h3>
-        <p style={{ color: "var(--text-muted)", fontSize: "13px" }}>
+    <div className="card" style={{ marginBottom: "24px" }}>
+      <div className="card-header">
+        {vehicleToEdit ? "Edit Vehicle" : "Register New Vehicle"}
+        <div style={{ color: "var(--text-muted)", fontSize: "13px", fontWeight: 400, marginTop: "4px" }}>
           {vehicleToEdit ? "Update details for the selected vehicle." : "Enter details to add a vehicle to your fleet."}
-        </p>
+        </div>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="error-message">
+        <div style={{ padding: "12px", backgroundColor: "var(--status-retired-bg)", color: "var(--status-retired-text)", borderRadius: "8px", marginBottom: "16px", fontSize: "13px" }}>
           {error}
         </div>
       )}
@@ -116,24 +87,24 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
         {/* Row 1 */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
           <div>
-            <label className="input-label">Registration Number</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Registration Number</label>
             <input
               name="registrationNumber"
               value={formData.registrationNumber || ""}
               onChange={handleChange}
               disabled={!!vehicleToEdit || isSubmitting}
-              className="input-field"
-              style={{ textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "monospace" }}
+              className="input mono"
+              style={{ textTransform: "uppercase" }}
               placeholder="e.g. MH12AB1234"
             />
           </div>
           <div>
-            <label className="input-label">Model</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Model</label>
             <input
               name="nameModel"
               value={formData.nameModel || ""}
               onChange={handleChange}
-              className="input-field"
+              className="input"
               placeholder="e.g. Tata Ace Gold"
               disabled={isSubmitting}
             />
@@ -143,43 +114,41 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
         {/* Row 2 */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "16px" }}>
           <div>
-            <label className="input-label">Vehicle Type</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Vehicle Type</label>
             <select
               name="type"
               value={formData.type || ""}
               onChange={handleChange}
-              className="input-field select-field"
+              className="input"
               disabled={isSubmitting}
             >
-              <option value="">Select type</option>
-              {Object.values(VehicleType).map((t) => (
-                <option key={t} value={t}>{TYPE_LABELS[t]}</option>
+              <option value="" disabled>Select Type</option>
+              {Object.keys(VehicleType).map((type) => (
+                <option key={type} value={type}>{TYPE_LABELS[type as VehicleType] || type}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="input-label">Capacity (kg)</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Capacity (kg)</label>
             <input
               type="number"
               name="maxLoadCapacityKg"
               value={formData.maxLoadCapacityKg || ""}
               onChange={handleChange}
-              min={1}
-              className="input-field"
-              placeholder="500"
+              className="input"
+              placeholder="e.g. 1500"
               disabled={isSubmitting}
             />
           </div>
           <div>
-            <label className="input-label">Odometer (km)</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Acquisition Cost (₹)</label>
             <input
               type="number"
-              name="odometerKm"
-              value={formData.odometerKm || ""}
+              name="acquisitionCost"
+              value={formData.acquisitionCost || ""}
               onChange={handleChange}
-              min={0}
-              className="input-field"
-              placeholder="0"
+              className="input"
+              placeholder="e.g. 750000"
               disabled={isSubmitting}
             />
           </div>
@@ -188,47 +157,47 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
         {/* Row 3 */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
           <div>
-            <label className="input-label">Acquisition Cost</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Current Odometer (km)</label>
             <input
               type="number"
-              name="acquisitionCost"
-              value={formData.acquisitionCost || ""}
+              name="odometerKm"
+              value={formData.odometerKm || ""}
               onChange={handleChange}
-              min={1}
-              className="input-field"
-              placeholder="650000"
+              className="input"
+              placeholder="e.g. 15000"
               disabled={isSubmitting}
             />
           </div>
           <div>
-            <label className="input-label">Region</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Region</label>
             <input
               name="region"
               value={formData.region || ""}
               onChange={handleChange}
-              className="input-field"
+              className="input"
               placeholder="e.g. West"
               disabled={isSubmitting}
             />
           </div>
           <div>
-            <label className="input-label">Depot</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Depot Name</label>
             <input
               name="depotName"
               value={formData.depotName || ""}
               onChange={handleChange}
-              className="input-field"
-              placeholder="e.g. D1"
+              className="input"
+              placeholder="e.g. Mumbai Central"
               disabled={isSubmitting}
             />
           </div>
         </div>
 
         {/* Actions */}
-        <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", borderTop: "1px solid var(--border)", paddingTop: "16px" }}>
           <button
             type="button"
             onClick={onClear}
+            disabled={isSubmitting}
             className="app-button-secondary"
           >
             Cancel
@@ -237,8 +206,9 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
             type="submit"
             disabled={!isValid || isSubmitting}
             className="app-button"
+            style={{ opacity: (!isValid || isSubmitting) ? 0.5 : 1, cursor: (!isValid || isSubmitting) ? "not-allowed" : "pointer" }}
           >
-            {isSubmitting ? "Saving…" : vehicleToEdit ? "Update Vehicle" : "Register Vehicle"}
+            {isSubmitting ? "Saving..." : "Save Vehicle"}
           </button>
         </div>
       </form>

@@ -35,7 +35,7 @@ export default function VehicleFilters({ filters, onFilterChange }: VehicleFilte
           placeholder="Search registration..."
           value={filters.registration || ""}
           onChange={(e) => onFilterChange("registration", e.target.value)}
-          className="input-field"
+          className="input"
           style={{ paddingLeft: "36px" }}
         />
       </div>
@@ -44,7 +44,7 @@ export default function VehicleFilters({ filters, onFilterChange }: VehicleFilte
       <select
         value={filters.type || ""}
         onChange={(e) => onFilterChange("type", e.target.value)}
-        className="input-field select-field"
+        className="input"
         style={{ width: "160px" }}
       >
         <option value="">All types</option>
@@ -57,7 +57,7 @@ export default function VehicleFilters({ filters, onFilterChange }: VehicleFilte
       <select
         value={filters.status || ""}
         onChange={(e) => onFilterChange("status", e.target.value)}
-        className="input-field select-field"
+        className="input"
         style={{ width: "160px" }}
       >
         <option value="">All statuses</option>
@@ -75,7 +75,7 @@ export default function VehicleFilters({ filters, onFilterChange }: VehicleFilte
             onFilterChange("status", "");
           }}
           className="app-button-secondary"
-          style={{ padding: "12px 16px", borderRadius: "12px", background: "transparent", border: "none" }}
+          style={{ border: "none" }}
         >
           Clear filters
         </button>

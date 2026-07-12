@@ -15,11 +15,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-page)' }}>
-      <Sidebar userRole={session.role} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-        <Navbar userRole={session.role} userName={session.name} />
-        <main style={{ flex: 1, padding: '32px', overflowY: 'auto', overflowX: 'hidden' }}>
+    <div className="app-shell">
+      <Sidebar />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+        <Navbar />
+        {/* Main content area — pages that need full-bleed (like Operations) use
+            a negative-margin wrapper inside to escape this padding */}
+        <main
+          id="dashboard-main"
+          style={{
+            flex: 1,
+            padding: "28px 32px",
+            overflowY: "auto",
+            overflowX: "hidden",
+            position: "relative",
+          }}
+        >
           {children}
         </main>
       </div>

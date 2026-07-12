@@ -90,7 +90,6 @@ export default function FleetPage() {
         <button
           onClick={() => setIsFormVisible(!isFormVisible)}
           className="app-button"
-          style={{ display: "flex", alignItems: "center", gap: "6px" }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

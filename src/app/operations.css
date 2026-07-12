@@ -1,0 +1,208 @@
+/* ─── Operations Center Additions ─────────────────────────────── */
+/* These extend globals.css for the Operations module.              */
+
+/* Ops layout shell */
+.ops-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg);
+  overflow: hidden;
+}
+
+/* Compact ops card — tighter than .card for sidebar/panels */
+.ops-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.ops-card + .ops-card { margin-top: 10px; }
+
+/* Card title row */
+.ops-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+}
+
+/* Info rows inside cards */
+.ops-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.ops-info-row:last-child { border-bottom: none; }
+
+.ops-info-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.ops-info-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-all;
+}
+
+/* Avatar */
+.ops-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+/* Safety score bar */
+.ops-score-bar {
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--border);
+  overflow: hidden;
+  margin-top: 6px;
+}
+.ops-score-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Progress bar */
+.ops-progress-bar {
+  height: 3px;
+  border-radius: 2px;
+  background-color: var(--border);
+  overflow: hidden;
+  margin-top: 4px;
+}
+.ops-progress-fill {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 2px;
+  transition: width 1s ease;
+}
+
+/* Trip card in sidebar */
+.ops-trip-card {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.12s;
+  border-left: 2px solid transparent;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.ops-trip-card:hover { background-color: var(--bg-secondary); }
+.ops-trip-card.selected {
+  background-color: var(--bg-secondary);
+  border-left-color: #3b82f6;
+}
+
+/* KPI stat card */
+.ops-kpi {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  flex: 1;
+  min-width: 0;
+}
+.ops-kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.ops-kpi-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* Map toolbar button */
+.ops-map-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--button);
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+.ops-map-btn:hover { background-color: var(--button-hover); color: var(--text-primary); }
+.ops-map-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.ops-map-btn.active { background-color: var(--button-hover); color: #3b82f6; border-color: var(--border-focus); }
+
+/* Map legend */
+.ops-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.ops-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.ops-legend-line {
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Route timeline */
+.ops-timeline {
+  flex-shrink: 0;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Sidebar search */
+.ops-search {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.12s;
+}
+.ops-search:focus { border-color: var(--border-focus); }
+.ops-search::placeholder { color: var(--text-muted); }
