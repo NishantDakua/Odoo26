@@ -14,8 +14,6 @@ const TYPE_LABELS: Record<VehicleType, string> = {
   TRUCK: "Truck",
   MINI: "Mini",
   OTHER: "Other",
-  BUS: "Bus",
-  MINIBUS: "Minibus",
 };
 
 type VehicleFiltersProps = {
