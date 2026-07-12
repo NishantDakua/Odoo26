@@ -1,17 +1,42 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, XCircle, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { CheckCircle2, XCircle, ChevronRight, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import {
-  mockVehicles,
-  mockDrivers,
-  initialTrips,
-  type MockTrip,
-  type MockVehicle,
-  type MockDriver,
-} from "@/lib/trips-mock-data";
+
+// ── API types ─────────────────────────────────────────────────────────────────
+
+type TripStatus = "DRAFT" | "DISPATCHED" | "COMPLETED" | "CANCELLED";
+
+type Trip = {
+  id: string;
+  tripCode: string;
+  source: string;
+  destination: string;
+  vehicleId: string | null;
+  driverId: string | null;
+  cargoWeightKg: number;
+  plannedDistanceKm: number;
+  status: TripStatus;
+  vehicle: { id: string; registrationNumber: string; nameModel: string } | null;
+  driver: { id: string; name: string } | null;
+};
+
+type Vehicle = {
+  id: string;
+  registrationNumber: string;
+  nameModel: string;
+  maxLoadCapacityKg: number;
+  status: string;
+};
+
+type Driver = {
+  id: string;
+  name: string;
+  status: string;
+  licenseExpiryDate: string;
+};
 
 type TripFormState = {
   source: string;
@@ -29,18 +54,14 @@ type CompletionData = {
 };
 
 const emptyForm: TripFormState = {
-  source: "",
-  destination: "",
-  vehicleId: "",
-  driverId: "",
-  cargoWeightKg: "",
-  plannedDistanceKm: "",
+  source: "", destination: "", vehicleId: "", driverId: "", cargoWeightKg: "", plannedDistanceKm: "",
 };
 
-const STAGES = ["DRAFT", "DISPATCHED", "COMPLETED"] as const;
-type Stage = (typeof STAGES)[number] | "CANCELLED";
+// ── Stepper ───────────────────────────────────────────────────────────────────
 
-function TripStepper({ status }: { status: Stage }) {
+const STAGES = ["DRAFT", "DISPATCHED", "COMPLETED"] as const;
+
+function TripStepper({ status }: { status: TripStatus }) {
   const cancelled = status === "CANCELLED";
   const activeIndex = cancelled ? -1 : STAGES.indexOf(status as (typeof STAGES)[number]);
   return (
@@ -52,26 +73,17 @@ function TripStepper({ status }: { status: Stage }) {
         return (
           <div key={stage} className="flex items-center">
             <div className="flex flex-col items-center gap-1">
-              <div
-                className={[
-                  "w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors",
-                  isCancelSlot
-                    ? "border-red-500/40 bg-red-500/10 text-red-400"
-                    : done
-                    ? "border-blue-500 bg-blue-500 text-white"
-                    : active
-                    ? "border-blue-500 bg-blue-500/10 text-blue-500"
-                    : "border-gray-300 dark:border-gray-700 bg-transparent text-gray-400",
-                ].join(" ")}
-              >
+              <div className={["w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors",
+                isCancelSlot ? "border-red-500/40 bg-red-500/10 text-red-400"
+                : done ? "border-blue-500 bg-blue-500 text-white"
+                : active ? "border-blue-500 bg-blue-500/10 text-blue-500"
+                : "border-gray-300 dark:border-gray-700 bg-transparent text-gray-400",
+              ].join(" ")}>
                 {done ? <CheckCircle2 size={14} /> : isCancelSlot ? <XCircle size={14} /> : i + 1}
               </div>
-              <span
-                className={[
-                  "text-[10px] font-medium whitespace-nowrap",
-                  isCancelSlot ? "text-red-400" : active ? "text-blue-500" : done ? "text-gray-600 dark:text-gray-300" : "text-gray-400",
-                ].join(" ")}
-              >
+              <span className={["text-[10px] font-medium whitespace-nowrap",
+                isCancelSlot ? "text-red-400" : active ? "text-blue-500" : done ? "text-gray-600 dark:text-gray-300" : "text-gray-400",
+              ].join(" ")}>
                 {isCancelSlot ? "CANCELLED" : stage}
               </span>
             </div>
@@ -85,9 +97,9 @@ function TripStepper({ status }: { status: Stage }) {
   );
 }
 
-function Field({
-  label, value, onChange, type = "text", placeholder, required,
-}: {
+// ── Shared field ──────────────────────────────────────────────────────────────
+
+function Field({ label, value, onChange, type = "text", placeholder, required }: {
   label: string; value: string; onChange: (v: string) => void;
   type?: string; placeholder?: string; required?: boolean;
 }) {
@@ -96,35 +108,45 @@ function Field({
       <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        min={type === "number" ? "0" : undefined}
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder} min={type === "number" ? "0" : undefined}
         className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
   );
 }
 
+// ── Complete modal ────────────────────────────────────────────────────────────
+
 function CompleteModal({ trip, onConfirm, onClose }: {
-  trip: MockTrip; onConfirm: (data: CompletionData) => void; onClose: () => void;
+  trip: Trip; onConfirm: (data: CompletionData) => Promise<void>; onClose: () => void;
 }) {
   const [form, setForm] = useState<CompletionData>({ finalOdometer: "", fuelConsumedL: "", revenueInr: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   const valid = form.finalOdometer !== "" && form.fuelConsumedL !== "";
+
+  async function handleConfirm() {
+    if (!valid) return;
+    setSubmitting(true);
+    setErr(null);
+    try { await onConfirm(form); } catch (e: any) { setErr(e.message); } finally { setSubmitting(false); }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader><CardTitle>Complete Trip — {trip.tripCode}</CardTitle></CardHeader>
         <CardContent className="space-y-4 pt-4">
           <p className="text-sm text-gray-500 dark:text-gray-400">{trip.source} → {trip.destination}</p>
+          {err && <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">{err}</p>}
           <Field label="Final Odometer (km)" type="number" value={form.finalOdometer} onChange={(v) => setForm({ ...form, finalOdometer: v })} required />
           <Field label="Fuel Consumed (L)" type="number" value={form.fuelConsumedL} onChange={(v) => setForm({ ...form, fuelConsumedL: v })} required />
           <Field label="Revenue (INR, optional)" type="number" value={form.revenueInr} onChange={(v) => setForm({ ...form, revenueInr: v })} />
           <div className="flex gap-2 pt-1">
-            <button onClick={() => valid && onConfirm(form)} disabled={!valid} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-              Mark as Completed
+            <button onClick={handleConfirm} disabled={!valid || submitting}
+              className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              {submitting ? "Saving…" : "Mark as Completed"}
             </button>
             <button onClick={onClose} className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               Cancel
@@ -136,24 +158,20 @@ function CompleteModal({ trip, onConfirm, onClose }: {
   );
 }
 
+// ── Trip card ─────────────────────────────────────────────────────────────────
+
 function TripCard({ trip, isSelected, onSelect, onComplete, onCancel }: {
-  trip: MockTrip; isSelected: boolean; onSelect: () => void; onComplete: () => void; onCancel: () => void;
+  trip: Trip; isSelected: boolean; onSelect: () => void; onComplete: () => void; onCancel: () => void;
 }) {
-  const etaNote =
-    trip.status === "DRAFT" ? "Awaiting dispatch"
+  const etaNote = trip.status === "DRAFT" ? "Awaiting dispatch"
     : trip.status === "CANCELLED" ? "Cancelled"
-    : trip.status === "COMPLETED" ? "Arrived"
-    : trip.eta;
+    : trip.status === "COMPLETED" ? "Arrived" : "In progress";
+
   return (
-    <div
-      onClick={onSelect}
-      className={[
-        "rounded-xl border p-4 cursor-pointer transition-all",
-        isSelected
-          ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
-          : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-700",
-      ].join(" ")}
-    >
+    <div onClick={onSelect} className={["rounded-xl border p-4 cursor-pointer transition-all",
+      isSelected ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
+      : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-700",
+    ].join(" ")}>
       <div className="flex items-start justify-between gap-2 mb-3">
         <div>
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{trip.tripCode}</span>
@@ -166,8 +184,8 @@ function TripCard({ trip, isSelected, onSelect, onComplete, onCancel }: {
         <StatusBadge status={trip.status} variant="trip" />
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600 dark:text-gray-400 mb-3">
-        <span><span className="text-gray-400 dark:text-gray-500">Vehicle: </span>{trip.vehicleLabel}</span>
-        <span><span className="text-gray-400 dark:text-gray-500">Driver: </span>{trip.driverLabel}</span>
+        <span><span className="text-gray-400 dark:text-gray-500">Vehicle: </span>{trip.vehicle?.registrationNumber ?? "—"}</span>
+        <span><span className="text-gray-400 dark:text-gray-500">Driver: </span>{trip.driver?.name ?? "—"}</span>
         <span><span className="text-gray-400 dark:text-gray-500">Cargo: </span>{trip.cargoWeightKg.toLocaleString()} kg</span>
         <span><span className="text-gray-400 dark:text-gray-500">ETA: </span>{etaNote}</span>
       </div>
@@ -181,24 +199,63 @@ function TripCard({ trip, isSelected, onSelect, onComplete, onCancel }: {
   );
 }
 
+// ── Create trip form ──────────────────────────────────────────────────────────
+
 const selectCls = "w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
-function CreateTripForm({ availableVehicles, availableDrivers, onDispatch }: {
-  availableVehicles: MockVehicle[]; availableDrivers: MockDriver[]; onDispatch: (form: TripFormState) => void;
+function CreateTripForm({ vehicles, drivers, onCreated }: {
+  vehicles: Vehicle[]; drivers: Driver[]; onCreated: (trip: Trip) => void;
 }) {
   const [form, setForm] = useState<TripFormState>(emptyForm);
-  const selectedVehicle = availableVehicles.find((v) => v.id === form.vehicleId);
-  const cargoNum = parseFloat(form.cargoWeightKg) || 0;
-  const overCapacity = selectedVehicle && cargoNum > 0 ? cargoNum - selectedVehicle.capacityKg : 0;
-  const canDispatch =
-    form.source.trim() !== "" && form.destination.trim() !== "" &&
-    form.vehicleId !== "" && form.driverId !== "" &&
-    cargoNum > 0 && form.plannedDistanceKm !== "" && overCapacity <= 0;
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  function handleSubmit() {
-    if (!canDispatch) return;
-    onDispatch(form);
-    setForm(emptyForm);
+  const selectedVehicle = vehicles.find((v) => v.id === form.vehicleId);
+  const cargoNum = parseFloat(form.cargoWeightKg) || 0;
+  const overCapacity = selectedVehicle && cargoNum > 0 ? cargoNum - selectedVehicle.maxLoadCapacityKg : 0;
+
+  const canSubmit = form.source.trim() && form.destination.trim() && cargoNum > 0 && form.plannedDistanceKm && overCapacity <= 0;
+
+  async function handleSubmit() {
+    if (!canSubmit) return;
+    setSubmitting(true);
+    setErr(null);
+    try {
+      // Create as DRAFT then immediately dispatch if vehicle+driver selected
+      const createRes = await fetch("/api/trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: form.source.trim(),
+          destination: form.destination.trim(),
+          cargoWeightKg: parseFloat(form.cargoWeightKg),
+          plannedDistanceKm: parseFloat(form.plannedDistanceKm),
+          vehicleId: form.vehicleId || undefined,
+          driverId: form.driverId || undefined,
+        }),
+      });
+      const created = await createRes.json();
+      if (!createRes.ok) throw new Error(created.error?.message ?? "Failed to create trip");
+
+      // If both vehicle and driver are selected, dispatch immediately
+      if (form.vehicleId && form.driverId) {
+        const dispatchRes = await fetch(`/api/trips/${created.id}/dispatch`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ vehicleId: form.vehicleId, driverId: form.driverId }),
+        });
+        const dispatched = await dispatchRes.json();
+        if (!dispatchRes.ok) throw new Error(dispatched.error?.message ?? "Failed to dispatch trip");
+        onCreated(dispatched);
+      } else {
+        onCreated(created);
+      }
+      setForm(emptyForm);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -213,8 +270,8 @@ function CreateTripForm({ availableVehicles, availableDrivers, onDispatch }: {
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Vehicle</label>
           <select value={form.vehicleId} onChange={(e) => setForm({ ...form, vehicleId: e.target.value })} className={selectCls}>
             <option value="">Select a vehicle…</option>
-            {availableVehicles.map((v) => (
-              <option key={v.id} value={v.id}>{v.label} — {v.capacityKg.toLocaleString()} kg capacity</option>
+            {vehicles.map((v) => (
+              <option key={v.id} value={v.id}>{v.registrationNumber} ({v.nameModel}) — {v.maxLoadCapacityKg.toLocaleString()} kg</option>
             ))}
           </select>
         </div>
@@ -222,9 +279,7 @@ function CreateTripForm({ availableVehicles, availableDrivers, onDispatch }: {
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Driver</label>
           <select value={form.driverId} onChange={(e) => setForm({ ...form, driverId: e.target.value })} className={selectCls}>
             <option value="">Select a driver…</option>
-            {availableDrivers.map((d) => (
-              <option key={d.id} value={d.id}>{d.label}</option>
-            ))}
+            {drivers.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -239,11 +294,14 @@ function CreateTripForm({ availableVehicles, availableDrivers, onDispatch }: {
             </p>
           </div>
         )}
+        {err && <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">{err}</p>}
         <div className="flex gap-2 pt-1">
-          <button onClick={handleSubmit} disabled={!canDispatch} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-            {canDispatch ? "Dispatch" : "Dispatch (Unavailable)"}
+          <button onClick={handleSubmit} disabled={!canSubmit || submitting}
+            className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            {submitting ? "Saving…" : canSubmit ? (form.vehicleId && form.driverId ? "Create & Dispatch" : "Create Draft") : "Dispatch (Unavailable)"}
           </button>
-          <button onClick={() => setForm(emptyForm)} className="px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={() => { setForm(emptyForm); setErr(null); }}
+            className="px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
             Cancel
           </button>
         </div>
@@ -252,99 +310,145 @@ function CreateTripForm({ availableVehicles, availableDrivers, onDispatch }: {
   );
 }
 
-let nextTripNum = initialTrips.length + 1;
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function TripsPage() {
-  const [trips, setTrips] = useState<MockTrip[]>(initialTrips);
-  const [selectedId, setSelectedId] = useState<string>(initialTrips[0].id);
-  const [completingTrip, setCompletingTrip] = useState<MockTrip | null>(null);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [completingTrip, setCompletingTrip] = useState<Trip | null>(null);
 
-  const selectedTrip = trips.find((t) => t.id === selectedId) ?? trips[0];
+  const selectedTrip = trips.find((t) => t.id === selectedId) ?? trips[0] ?? null;
 
-  const dispatchedVehicleIds = new Set(trips.filter((t) => t.status === "DISPATCHED").map((t) => t.vehicleId));
-  const availableVehicles = mockVehicles.filter((v) => v.status === "AVAILABLE" && !dispatchedVehicleIds.has(v.id));
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [tripsRes, vehiclesRes, driversRes] = await Promise.all([
+        fetch("/api/trips"),
+        fetch("/api/vehicles?status=AVAILABLE"),
+        fetch("/api/drivers?status=AVAILABLE&licenseValid=true"),
+      ]);
+      if (tripsRes.ok) {
+        const data = await tripsRes.json();
+        const list: Trip[] = data.trips ?? data;
+        setTrips(list);
+        if (list.length > 0 && !selectedId) setSelectedId(list[0].id);
+      }
+      if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
+      if (driversRes.ok) setDrivers(await driversRes.json());
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedId]);
 
-  const dispatchedDriverIds = new Set(trips.filter((t) => t.status === "DISPATCHED").map((t) => t.driverId));
-  const availableDrivers = mockDrivers.filter((d) => d.status === "AVAILABLE" && d.licenseValid && !dispatchedDriverIds.has(d.id));
+  useEffect(() => { fetchAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleDispatch(form: TripFormState) {
-    const vehicle = mockVehicles.find((v) => v.id === form.vehicleId)!;
-    const driver = mockDrivers.find((d) => d.id === form.driverId)!;
-    const num = nextTripNum++;
-    const newTrip: MockTrip = {
-      id: `t${num}`,
-      tripCode: `TR${String(num).padStart(3, "0")}`,
-      source: form.source.trim(),
-      destination: form.destination.trim(),
-      vehicleId: vehicle.id,
-      vehicleLabel: vehicle.label,
-      driverId: driver.id,
-      driverLabel: driver.label,
-      cargoWeightKg: parseFloat(form.cargoWeightKg),
-      plannedDistanceKm: parseFloat(form.plannedDistanceKm),
-      status: "DISPATCHED",
-      eta: "Calculating…",
-    };
-    setTrips((prev) => [newTrip, ...prev]);
-    setSelectedId(newTrip.id);
+  function handleCreated(trip: Trip) {
+    setTrips((prev) => [trip, ...prev]);
+    setSelectedId(trip.id);
   }
 
-  function handleComplete(trip: MockTrip, data: CompletionData) {
-    setTrips((prev) =>
-      prev.map((t) =>
-        t.id === trip.id
-          ? { ...t, status: "COMPLETED" as const, eta: "Arrived", finalOdometer: parseFloat(data.finalOdometer), fuelConsumedL: parseFloat(data.fuelConsumedL), revenueInr: data.revenueInr ? parseFloat(data.revenueInr) : undefined }
-          : t
-      )
-    );
+  async function handleComplete(trip: Trip, data: CompletionData) {
+    const res = await fetch(`/api/trips/${trip.id}/complete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        finalOdometerKm: parseFloat(data.finalOdometer),
+        fuelConsumedLiters: parseFloat(data.fuelConsumedL),
+        revenue: data.revenueInr ? parseFloat(data.revenueInr) : undefined,
+      }),
+    });
+    const updated = await res.json();
+    if (!res.ok) throw new Error(updated.error?.message ?? "Failed to complete trip");
+    setTrips((prev) => prev.map((t) => (t.id === trip.id ? updated : t)));
     setCompletingTrip(null);
+    // refresh available vehicles/drivers
+    const [vr, dr] = await Promise.all([
+      fetch("/api/vehicles?status=AVAILABLE"),
+      fetch("/api/drivers?status=AVAILABLE&licenseValid=true"),
+    ]);
+    if (vr.ok) setVehicles(await vr.json());
+    if (dr.ok) setDrivers(await dr.json());
   }
 
-  function handleCancel(tripId: string) {
-    setTrips((prev) =>
-      prev.map((t) => t.id === tripId ? { ...t, status: "CANCELLED" as const, eta: "Cancelled" } : t)
+  async function handleCancel(tripId: string) {
+    const res = await fetch(`/api/trips/${tripId}/cancel`, { method: "POST" });
+    const updated = await res.json();
+    if (!res.ok) { alert(updated.error?.message ?? "Failed to cancel trip"); return; }
+    setTrips((prev) => prev.map((t) => (t.id === tripId ? updated : t)));
+    const [vr, dr] = await Promise.all([
+      fetch("/api/vehicles?status=AVAILABLE"),
+      fetch("/api/drivers?status=AVAILABLE&licenseValid=true"),
+    ]);
+    if (vr.ok) setVehicles(await vr.json());
+    if (dr.ok) setDrivers(await dr.json());
+  }
+
+  if (loading) {
+    return (
+      <div className="p-5 flex items-center justify-center min-h-[40vh]">
+        <RefreshCw size={20} className="animate-spin text-gray-400" />
+      </div>
     );
   }
 
   return (
     <div className="p-5 space-y-5">
+      {/* Lifecycle stepper */}
       <Card>
         <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="shrink-0">
             <p className="text-xs text-gray-400 mb-0.5">Selected trip</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {selectedTrip.tripCode} — {selectedTrip.source} → {selectedTrip.destination}
-            </p>
+            {selectedTrip ? (
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                {selectedTrip.tripCode} — {selectedTrip.source} → {selectedTrip.destination}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-400">No trips yet</p>
+            )}
           </div>
-          <div className="sm:ml-auto">
-            <TripStepper status={selectedTrip.status} />
-          </div>
+          {selectedTrip && (
+            <div className="sm:ml-auto">
+              <TripStepper status={selectedTrip.status} />
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 items-start">
         <div className="lg:col-span-2">
-          <CreateTripForm availableVehicles={availableVehicles} availableDrivers={availableDrivers} onDispatch={handleDispatch} />
+          <CreateTripForm vehicles={vehicles} drivers={drivers} onCreated={handleCreated} />
         </div>
         <div className="lg:col-span-3">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Live Board</CardTitle>
-                <span className="text-xs text-gray-400 tabular-nums">{trips.length} trips</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 tabular-nums">{trips.length} trips</span>
+                  <button onClick={fetchAll} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <RefreshCw size={13} />
+                  </button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 pt-4">
-              {trips.map((trip) => (
-                <TripCard
-                  key={trip.id}
-                  trip={trip}
-                  isSelected={trip.id === selectedId}
-                  onSelect={() => setSelectedId(trip.id)}
-                  onComplete={() => setCompletingTrip(trip)}
-                  onCancel={() => handleCancel(trip.id)}
-                />
-              ))}
+              {trips.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-8">No trips found</p>
+              ) : (
+                trips.map((trip) => (
+                  <TripCard
+                    key={trip.id}
+                    trip={trip}
+                    isSelected={trip.id === selectedId}
+                    onSelect={() => setSelectedId(trip.id)}
+                    onComplete={() => setCompletingTrip(trip)}
+                    onCancel={() => handleCancel(trip.id)}
+                  />
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
