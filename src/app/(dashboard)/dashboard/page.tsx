@@ -237,13 +237,12 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Vehicle Status</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-center pt-2">
+          <CardContent className="flex items-center justify-center py-4 px-4">
             <DonutChart
               segments={donutSegments}
               total={total}
               centerLabel="Total Vehicles"
-              size={150}
-              thickness={24}
+              thickness={28}
             />
           </CardContent>
         </Card>
