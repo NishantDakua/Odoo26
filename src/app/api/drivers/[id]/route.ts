@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import { JWT_COOKIE_NAME, LICENSE_EXPIRY_WARNING_DAYS } from '@/lib/constants';
-import { UpdateDriverSchema, PatchStatusSchema } from '@/lib/validators/driver';
+import { UpdateDriverSchema } from '@/lib/validators/driver';
 
 // ─── Helper: compute license expiry fields ────────────────────────────────────
 
@@ -83,85 +83,19 @@ export async function PUT(
         );
     }
 
+    // Destructure to safely handle licenseExpiryDate type conversion
+    const { licenseExpiryDate, ...rest } = parsed.data;
     const updated = await prisma.driver.update({
       where: { id: params.id },
       data: {
-        ...parsed.data,
-        ...(parsed.data.licenseExpiryDate && {
-          licenseExpiryDate: new Date(parsed.data.licenseExpiryDate),
-        }),
+        ...rest,
+        ...(licenseExpiryDate && { licenseExpiryDate: new Date(licenseExpiryDate) }),
       },
     });
 
     return NextResponse.json({ success: true, data: withLicenseFlags(updated) });
   } catch (error) {
     console.error('[PUT /api/drivers/:id]', error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
-  }
-}
-
-// ─── PATCH /api/drivers/:id  (status update — SO and DISPATCHER) ──────────────
-// NOTE: prefer /api/drivers/:id/status for status changes.
-// This handler remains for backward compat with drivers/page.tsx inline table.
-
-const DISPATCHER_ALLOWED = ['AVAILABLE', 'ON_TRIP'] as const;
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const token = req.cookies.get(JWT_COOKIE_NAME)?.value;
-    if (!token)
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-
-    const payload = await verifyToken(token);
-    if (!payload || !['SAFETY_OFFICER', 'DISPATCHER'].includes(payload.role))
-      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
-
-    const body = await req.json().catch(() => null);
-    if (!body)
-      return NextResponse.json({ success: false, error: 'Invalid request body' }, { status: 400 });
-
-    const parsed = PatchStatusSchema.safeParse(body);
-    if (!parsed.success)
-      return NextResponse.json(
-        { success: false, error: parsed.error.errors[0].message },
-        { status: 400 }
-      );
-
-    const { status } = parsed.data;
-
-    // Dispatchers may only set AVAILABLE or ON_TRIP
-    if (
-      payload.role === 'DISPATCHER' &&
-      !DISPATCHER_ALLOWED.includes(status as typeof DISPATCHER_ALLOWED[number])
-    ) {
-      return NextResponse.json(
-        { success: false, error: 'Dispatchers can only set status to AVAILABLE or ON_TRIP' },
-        { status: 403 }
-      );
-    }
-
-    const driver = await prisma.driver.findUnique({ where: { id: params.id } });
-    if (!driver)
-      return NextResponse.json({ success: false, error: 'Driver not found' }, { status: 404 });
-
-    if (payload.role === 'DISPATCHER' && status === 'ON_TRIP' && driver.status === 'SUSPENDED') {
-      return NextResponse.json(
-        { success: false, error: 'Cannot assign a suspended driver to a trip' },
-        { status: 400 }
-      );
-    }
-
-    const updated = await prisma.driver.update({
-      where: { id: params.id },
-      data: { status },
-    });
-
-    return NextResponse.json({ success: true, data: updated });
-  } catch (error) {
-    console.error('[PATCH /api/drivers/:id]', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

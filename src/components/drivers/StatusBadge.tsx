@@ -2,33 +2,34 @@
 
 import { DriverStatusType } from '@/types';
 
-const STATUS_CONFIG: Record<
-  DriverStatusType,
-  { label: string; bg: string; text: string; dot: string }
-> = {
+const STATUS_CONFIG: Record<DriverStatusType, { label: string; bg: string; border: string; text: string; dot: string }> = {
   AVAILABLE: {
     label: 'Available',
-    bg: 'bg-emerald-500/10',
-    text: 'text-emerald-400',
-    dot: 'bg-emerald-400',
+    bg:     'var(--status-green-bg)',
+    border: 'var(--status-green-border)',
+    text:   'var(--status-green-text)',
+    dot:    'var(--status-green-text)',
   },
   ON_TRIP: {
     label: 'On Trip',
-    bg: 'bg-blue-500/10',
-    text: 'text-blue-400',
-    dot: 'bg-blue-400',
+    bg:     'var(--status-blue-bg)',
+    border: 'var(--status-blue-border)',
+    text:   'var(--status-blue-text)',
+    dot:    'var(--status-blue-text)',
   },
   OFF_DUTY: {
     label: 'Off Duty',
-    bg: 'bg-zinc-500/10',
-    text: 'text-zinc-400',
-    dot: 'bg-zinc-400',
+    bg:     'var(--input-bg)',
+    border: 'var(--border)',
+    text:   'var(--text-muted)',
+    dot:    'var(--text-muted)',
   },
   SUSPENDED: {
     label: 'Suspended',
-    bg: 'bg-red-500/10',
-    text: 'text-red-400',
-    dot: 'bg-red-400',
+    bg:     'var(--status-red-bg)',
+    border: 'var(--status-red-border)',
+    text:   'var(--status-red-text)',
+    dot:    'var(--status-red-text)',
   },
 };
 
@@ -39,10 +40,15 @@ interface StatusBadgeProps {
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const cfg = STATUS_CONFIG[status];
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${cfg.bg} ${cfg.text}`}
-    >
-      <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '3px 8px', borderRadius: 99,
+      fontSize: 11, fontWeight: 500,
+      background: cfg.bg,
+      border: `1px solid ${cfg.border}`,
+      color: cfg.text,
+    }}>
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
       {cfg.label}
     </span>
   );

@@ -1,11 +1,15 @@
-// todo: fuel expenses page
-export default function FuelExpensesPage() {
-  return <div className="p-6"><h1 className="text-xl font-semibold text-gray-800">Fuel & Expenses</h1><p className="text-gray-500 mt-2">Coming soon.</p></div>;
 export default function FuelExpensesPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-white">Fuel &amp; Expenses</h1>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Track fuel consumption and trip expenses.</p>
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 4 }}>
+          Finance
+        </p>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>
+          Fuel &amp; Expenses
+        </h1>
+      </div>
+      <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Fuel and expense tracking — coming soon.</p>
     </div>
   );
 }

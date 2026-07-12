@@ -1,6 +1,3 @@
-// todo: maintenance page
-export default function MaintenancePage() {
-  return <div className="p-6"><h1 className="text-xl font-semibold text-gray-800">Maintenance</h1><p className="text-gray-500 mt-2">Coming soon.</p></div>;
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -12,21 +9,15 @@ export default function MaintenancePage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  
   const [logToClose, setLogToClose] = useState<any | null>(null);
   const [closeError, setCloseError] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
     const res = await fetch("/api/maintenance");
-    if (res.ok) {
-      const data = await res.json();
-      setLogs(data);
-    }
+    if (res.ok) setLogs(await res.json());
   }, []);
 
-  useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
   const handleSaveMaintenance = async (data: any) => {
     setFormError(null);
@@ -35,38 +26,37 @@ export default function MaintenancePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-
     if (!res.ok) {
-      const error = await res.json();
-      setFormError(error.error || "Failed to save maintenance record");
+      const err = await res.json();
+      setFormError(err.error || "Failed to save maintenance record");
       return;
     }
-
     fetchLogs();
   };
 
   const handleConfirmClose = async () => {
     if (!logToClose) return;
     setCloseError(null);
-
     const res = await fetch(`/api/maintenance/${logToClose.id}/close`, { method: "PATCH" });
     if (!res.ok) {
-      const error = await res.json();
-      setCloseError(error.error || "Failed to close maintenance record");
+      const err = await res.json();
+      setCloseError(err.error || "Failed to close maintenance record");
       return;
     }
-
     setLogToClose(null);
     fetchLogs();
   };
 
   return (
     <div>
-      {/* Page header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "32px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28 }}>
         <div>
-          <h2 className="page-subtitle">Service Records</h2>
-          <h1 className="page-title">Maintenance</h1>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 4 }}>
+            Service Records
+          </p>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", margin: 0 }}>
+            Maintenance
+          </h1>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -79,11 +69,8 @@ export default function MaintenancePage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: showForm ? "340px 1fr" : "1fr", gap: "20px", alignItems: "start" }}>
-        {/* LEFT: FORM */}
+      <div style={{ display: "grid", gridTemplateColumns: showForm ? "340px 1fr" : "1fr", gap: 20, alignItems: "start" }}>
         {showForm && <MaintenanceForm onSave={handleSaveMaintenance} error={formError} />}
-
-        {/* RIGHT: HISTORY */}
         <MaintenanceTable logs={logs} onCloseClick={setLogToClose} />
       </div>
 
@@ -107,10 +94,7 @@ export default function MaintenancePage() {
           </>
         }
         onConfirm={handleConfirmClose}
-        onCancel={() => {
-          setLogToClose(null);
-          setCloseError(null);
-        }}
+        onCancel={() => { setLogToClose(null); setCloseError(null); }}
         confirmText="Close Record"
       />
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Table from "./ui/Table";
-import Modal from "./ui/Modal";
+import { Modal } from "./ui/Modal";
 import { exportToCSV } from "@/lib/csv";
 import type { Column } from "./ui/Table";
 

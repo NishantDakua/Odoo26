@@ -5,7 +5,6 @@ import { signToken } from '@/lib/jwt';
 import { LoginSchema } from '@/lib/validators/auth';
 import {
   JWT_COOKIE_NAME,
-  JWT_EXPIRY_DEFAULT,
   JWT_EXPIRY_REMEMBER,
   LOCK_DURATION_MINUTES,
   LOCK_THRESHOLD,
@@ -44,7 +43,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      // Avoid timing attacks: don't reveal whether email exists
+      // Constant-time response to prevent user enumeration via timing
+      await verifyPassword('__dummy_password__', '$2b$12$KIXHnMbFMpZNpNpF3QX5DOsomethingfaketopreventtimingattack');
       return NextResponse.json<ApiResponse>(
         { success: false, error: 'Invalid email or password' },
         { status: 401 }
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
       role: user.role,
     };
 
-    const expiry = rememberMe ? JWT_EXPIRY_REMEMBER : JWT_EXPIRY_DEFAULT;
+    const expiry = rememberMe ? JWT_EXPIRY_REMEMBER : '24h';
     const token = await signToken(payload, expiry);
 
     // ── 8. Set cookie ─────────────────────────────────────────────────────
