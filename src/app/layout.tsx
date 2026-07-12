@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "TransitOps | Fleet Management",
@@ -16,20 +13,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <html lang="en">
+      <body suppressHydrationWarning>{children}</body>
     <html lang="en" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                let isDark = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                if (isDark) document.documentElement.classList.add('dark');
+                var stored = localStorage.getItem('theme');
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (stored === 'dark' || (!stored && prefersDark)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
               } catch (e) {}
             `,
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans antialiased">
         <ThemeProvider>
           {children}
         </ThemeProvider>

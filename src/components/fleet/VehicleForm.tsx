@@ -19,8 +19,10 @@ const TYPE_LABELS: Record<VehicleType, string> = {
   MINIBUS: "Minibus",
 };
 
+type FormData = Omit<Partial<Vehicle>, 'acquisitionCost'> & { acquisitionCost?: number | string };
+
 export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: VehicleFormProps) {
-  const [formData, setFormData] = useState<Partial<Vehicle>>({
+  const [formData, setFormData] = useState<FormData>({
     registrationNumber: "",
     nameModel: "",
     type: "" as VehicleType,
@@ -51,7 +53,7 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
     e.preventDefault();
     if (!isValid) return;
     setIsSubmitting(true);
-    await onSave(formData);
+    await onSave(formData as Partial<Vehicle>);
     setIsSubmitting(false);
   };
 

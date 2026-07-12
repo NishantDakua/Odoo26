@@ -1,7 +1,19 @@
-import Sidebar from "@/components/layout/Sidebar";
-import Navbar from "@/components/layout/Navbar";
-
+// todo: dashboard layout
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+import React from 'react';
+import Sidebar from '@/components/layout/Sidebar';
+import Navbar from '@/components/layout/Navbar';
+import { getServerSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession();
+
+  if (!session) {
+    redirect('/login');
+  }
+
   return (
     <div className="app-shell">
       <Sidebar />
