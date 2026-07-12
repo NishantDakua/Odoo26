@@ -10,8 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
         "status-available": "#22c55e",
         "status-ontrip": "#3b82f6",
         "status-inshop": "#f97316",
