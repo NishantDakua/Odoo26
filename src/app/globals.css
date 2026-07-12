@@ -1,134 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ─── Reset ───────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* ─── Design Tokens (Light Mode Base) ────────────────────────── */
+/* ─── Design Tokens via CSS Variables ─────────────────────────────────────── */
 :root {
-  /* Surfaces */
-  --bg-page: #FFFFFF;
+  --bg-page:    #FFFFFF;
   --bg-sidebar: #FFFFFF;
-  --bg-navbar: #FFFFFF;
-  --bg-card: #FAFAFA;
-  
-  /* Borders */
-  --border: rgba(0, 0, 0, 0.08);
-  --border-subtle: rgba(0, 0, 0, 0.04);
-  
-  /* Text */
-  --text-primary: #1D1D1F;
-  --text-secondary: #636366;
-  --text-muted: rgba(0, 0, 0, 0.4);
-  
-  /* Inputs */
-  --input-bg: #F7F7F8;
-  --input-border: rgba(0, 0, 0, 0.06);
-  --input-focus: rgba(0, 0, 0, 0.15);
-  --input-hover: rgba(0, 0, 0, 0.04);
-
-  /* Buttons */
-  --btn-primary-bg: #F4F4F5;
+  --bg-navbar:  #FFFFFF;
+  --bg-card:    #FAFAFA;
+  --border:          rgba(0, 0, 0, 0.08);
+  --border-subtle:   rgba(0, 0, 0, 0.04);
+  --text-primary:    #1D1D1F;
+  --text-secondary:  #636366;
+  --text-muted:      rgba(0, 0, 0, 0.4);
+  --input-bg:        #F7F7F8;
+  --input-border:    rgba(0, 0, 0, 0.06);
+  --input-focus:     rgba(0, 0, 0, 0.15);
+  --input-hover:     rgba(0, 0, 0, 0.04);
+  --btn-primary-bg:     #F4F4F5;
   --btn-primary-border: rgba(0, 0, 0, 0.08);
-  --btn-primary-text: #1D1D1F;
-  --btn-primary-hover: rgba(0, 0, 0, 0.04);
-  
-  --btn-secondary-bg: #FFFFFF;
+  --btn-primary-text:   #1D1D1F;
+  --btn-primary-hover:  rgba(0, 0, 0, 0.04);
+  --btn-secondary-bg:     #FFFFFF;
   --btn-secondary-border: rgba(0, 0, 0, 0.08);
-  --btn-secondary-text: #1D1D1F;
-  --btn-secondary-hover: #F4F4F5;
-
-  /* Status Badges */
-  --status-green-bg: rgba(34, 197, 94, 0.08);
+  --btn-secondary-text:   #1D1D1F;
+  --btn-secondary-hover:  #F4F4F5;
+  --status-green-bg:     rgba(34, 197, 94, 0.08);
   --status-green-border: rgba(34, 197, 94, 0.16);
-  --status-green-text: #16a34a;
-
-  --status-blue-bg: rgba(59, 130, 246, 0.08);
-  --status-blue-border: rgba(59, 130, 246, 0.16);
-  --status-blue-text: #2563eb;
-
-  --status-amber-bg: rgba(245, 158, 11, 0.08);
+  --status-green-text:   #16a34a;
+  --status-blue-bg:      rgba(59, 130, 246, 0.08);
+  --status-blue-border:  rgba(59, 130, 246, 0.16);
+  --status-blue-text:    #2563eb;
+  --status-amber-bg:     rgba(245, 158, 11, 0.08);
   --status-amber-border: rgba(245, 158, 11, 0.16);
-  --status-amber-text: #d97706;
-
-  --status-red-bg: rgba(239, 68, 68, 0.08);
-  --status-red-border: rgba(239, 68, 68, 0.16);
-  --status-red-text: #dc2626;
-
-  /* Accent pill */
-  --pill-bg: rgba(0, 0, 0, 0.04);
+  --status-amber-text:   #d97706;
+  --status-red-bg:       rgba(239, 68, 68, 0.08);
+  --status-red-border:   rgba(239, 68, 68, 0.16);
+  --status-red-text:     #dc2626;
+  --pill-bg:     rgba(0, 0, 0, 0.04);
   --pill-border: rgba(0, 0, 0, 0.08);
-  --pill-text: rgba(0, 0, 0, 0.6);
-  
-  /* Utilities */
+  --pill-text:   rgba(0, 0, 0, 0.6);
   --table-hover: rgba(0, 0, 0, 0.02);
 }
 
-/* ─── Design Tokens (Dark Mode) ──────────────────────────────── */
 .dark {
-  /* Surfaces */
-  --bg-page: #000000;
-  --bg-sidebar: #000000;
-  --bg-navbar: #000000;
-  --bg-card: #0B0B0B;
-  
-  /* Borders */
-  --border: rgba(255, 255, 255, 0.06);
-  --border-subtle: rgba(255, 255, 255, 0.03);
-  
-  /* Text */
-  --text-primary: #FFFFFF;
+  --bg-page:    #0a0a0a;
+  --bg-sidebar: #0a0a0a;
+  --bg-navbar:  #0a0a0a;
+  --bg-card:    #111111;
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --text-primary:   #FFFFFF;
   --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.4);
-  
-  /* Inputs */
-  --input-bg: rgba(255, 255, 255, 0.04);
-  --input-border: rgba(255, 255, 255, 0.08);
-  --input-focus: rgba(255, 255, 255, 0.18);
-  --input-hover: rgba(255, 255, 255, 0.12);
-
-  /* Buttons */
-  --btn-primary-bg: rgba(255, 255, 255, 0.08);
-  --btn-primary-border: rgba(255, 255, 255, 0.12);
-  --btn-primary-text: #FFFFFF;
-  --btn-primary-hover: rgba(255, 255, 255, 0.12);
-  
-  --btn-secondary-bg: transparent;
+  --text-muted:     rgba(255, 255, 255, 0.35);
+  --input-bg:     rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.09);
+  --input-focus:  rgba(255, 255, 255, 0.18);
+  --input-hover:  rgba(255, 255, 255, 0.08);
+  --btn-primary-bg:     rgba(255, 255, 255, 0.09);
+  --btn-primary-border: rgba(255, 255, 255, 0.13);
+  --btn-primary-text:   #FFFFFF;
+  --btn-primary-hover:  rgba(255, 255, 255, 0.13);
+  --btn-secondary-bg:     transparent;
   --btn-secondary-border: rgba(255, 255, 255, 0.12);
-  --btn-secondary-text: #FFFFFF;
-  --btn-secondary-hover: rgba(255, 255, 255, 0.05);
-
-  /* Status Badges */
-  --status-green-bg: rgba(34, 197, 94, 0.08);
-  --status-green-border: rgba(34, 197, 94, 0.16);
-  --status-green-text: #4ADE80;
-
-  --status-blue-bg: rgba(59, 130, 246, 0.08);
-  --status-blue-border: rgba(59, 130, 246, 0.16);
-  --status-blue-text: #60A5FA;
-
-  --status-amber-bg: rgba(245, 158, 11, 0.08);
-  --status-amber-border: rgba(245, 158, 11, 0.16);
-  --status-amber-text: #FBBF24;
-
-  --status-red-bg: rgba(239, 68, 68, 0.08);
-  --status-red-border: rgba(239, 68, 68, 0.16);
-  --status-red-text: #F87171;
-
-  /* Accent pill */
-  --pill-bg: rgba(255, 255, 255, 0.05);
-  --pill-border: rgba(255, 255, 255, 0.08);
-  --pill-text: rgba(255, 255, 255, 0.75);
-  
-  /* Utilities */
+  --btn-secondary-text:   #FFFFFF;
+  --btn-secondary-hover:  rgba(255, 255, 255, 0.05);
+  --status-green-bg:     rgba(34, 197, 94, 0.12);
+  --status-green-border: rgba(34, 197, 94, 0.2);
+  --status-green-text:   #4ADE80;
+  --status-blue-bg:      rgba(59, 130, 246, 0.12);
+  --status-blue-border:  rgba(59, 130, 246, 0.2);
+  --status-blue-text:    #60A5FA;
+  --status-amber-bg:     rgba(245, 158, 11, 0.12);
+  --status-amber-border: rgba(245, 158, 11, 0.2);
+  --status-amber-text:   #FBBF24;
+  --status-red-bg:       rgba(239, 68, 68, 0.12);
+  --status-red-border:   rgba(239, 68, 68, 0.2);
+  --status-red-text:     #F87171;
+  --pill-bg:     rgba(255, 255, 255, 0.06);
+  --pill-border: rgba(255, 255, 255, 0.09);
+  --pill-text:   rgba(255, 255, 255, 0.75);
   --table-hover: rgba(255, 255, 255, 0.03);
 }
 
-/* ─── Global Styles ───────────────────────────────────────────── */
+/* ─── Global Styles ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html, body {
   background: var(--bg-page);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 15px; /* Between 15-16px body per spec */
+  font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -138,245 +99,7 @@ a { text-decoration: none; color: inherit; }
 input, select, textarea, button { font-family: inherit; }
 button { border: none; cursor: pointer; }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-/* ─── Typography Classes ─────────────────────────────────────── */
-.text-display {
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  color: var(--text-primary);
-}
-
-.page-title {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.section-title {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--text-primary);
-  margin: 0 0 16px 0;
-}
-
-.page-subtitle {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin: 0 0 4px 0;
-}
-
-/* ─── Component Classes ──────────────────────────────────────── */
-
-/* Cards */
-.app-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 24px;
-}
-
-.app-card-header {
-  margin-bottom: 24px;
-}
-
-/* Buttons */
-.app-button {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  background: var(--btn-primary-bg);
-  border: 1px solid var(--btn-primary-border);
-  color: var(--btn-primary-text);
-  transition: background-color 0.15s, opacity 0.15s;
-}
-
-.app-button:hover:not(:disabled) {
-  background: var(--btn-primary-hover);
-}
-
-.app-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.app-button-secondary {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  background: var(--btn-secondary-bg);
-  border: 1px solid var(--btn-secondary-border);
-  color: var(--btn-secondary-text);
-  transition: background-color 0.15s, opacity 0.15s;
-}
-
-.app-button-secondary:hover:not(:disabled) {
-  background: var(--btn-secondary-hover);
-}
-
-.app-button-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Inputs */
-.input-field {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 12px;
-  color: var(--text-primary);
-  font-size: 15px;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-
-.input-field:hover:not(:disabled) {
-  background: var(--input-hover);
-}
-
-.input-field:focus {
-  border-color: var(--input-focus);
-}
-
-.input-field:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.input-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-/* Select specifics */
-.select-field {
-  appearance: none;
-  padding-right: 32px;
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23636366' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-}
-.dark .select-field {
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
-
-/* Tables */
-.app-table-wrapper {
-  overflow-x: auto;
-}
-
-.app-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table-header th {
-  padding: 10px 16px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-align: left;
-  white-space: nowrap;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-}
-
-.table-row {
-  transition: background 0.1s;
-}
-
-.table-row:hover {
-  background: var(--table-hover);
-}
-
-.table-row td {
-  padding: 12px 16px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-subtle);
-  white-space: nowrap;
-  vertical-align: middle;
-}
-
-/* Status Badges */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-.status-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.status-green {
-  background: var(--status-green-bg);
-  border: 1px solid var(--status-green-border);
-  color: var(--status-green-text);
-}
-.status-green .status-dot { background: var(--status-green-text); }
-
-.status-blue {
-  background: var(--status-blue-bg);
-  border: 1px solid var(--status-blue-border);
-  color: var(--status-blue-text);
-}
-.status-blue .status-dot { background: var(--status-blue-text); }
-
-.status-amber {
-  background: var(--status-amber-bg);
-  border: 1px solid var(--status-amber-border);
-  color: var(--status-amber-text);
-}
-.status-amber .status-dot { background: var(--status-amber-text); }
-
-.status-red {
-  background: var(--status-red-bg);
-  border: 1px solid var(--status-red-border);
-  color: var(--status-red-text);
-}
-.status-red .status-dot { background: var(--status-red-text); }
-
-/* Accent Pill (Role) */
-.role-pill {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--pill-text);
-  background: var(--pill-bg);
-  border: 1px solid var(--pill-border);
-  border-radius: 6px;
-  padding: 4px 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
