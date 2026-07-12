@@ -90,7 +90,7 @@ export default function AnalyticsDashboard({
               <XAxis dataKey="month" {...AXIS_PROPS} />
               <YAxis {...AXIS_PROPS} />
               <Tooltip
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: any) => formatCurrency(Number(value) || 0)}
                 cursor={CURSOR_STYLE}
               />
               <Line
@@ -125,7 +125,7 @@ export default function AnalyticsDashboard({
               <XAxis dataKey="name" {...AXIS_PROPS} />
               <YAxis {...AXIS_PROPS} />
               <Tooltip
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: any) => formatCurrency(Number(value) || 0)}
                 cursor={CURSOR_STYLE}
               />
               <Bar dataKey="totalCost" fill="#ef4444" radius={[4, 4, 0, 0]} />

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = 'force-dynamic';
 import { prisma } from "@/lib/prisma";
 import { TelemetryData } from "@/types/telemetry";
 import { RouteGeometry } from "@/types/route";

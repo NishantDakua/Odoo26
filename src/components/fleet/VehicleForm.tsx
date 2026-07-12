@@ -15,22 +15,14 @@ const TYPE_LABELS: Record<VehicleType, string> = {
   TRUCK: "Truck",
   MINI: "Mini",
   OTHER: "Other",
-  BUS: "Bus",
-  MINIBUS: "Minibus",
 };
 
 type FormData = Omit<Partial<Vehicle>, 'acquisitionCost'> & { acquisitionCost?: number | string };
 
 export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: VehicleFormProps) {
   const [formData, setFormData] = useState<FormData>({
-    registrationNumber: "",
-    nameModel: "",
-    type: "" as VehicleType,
-    maxLoadCapacityKg: 0,
-    odometerKm: 0,
-    acquisitionCost: 0,
-    region: "",
-    depotName: "",
+    registrationNumber: "", nameModel: "", type: "" as VehicleType,
+    maxLoadCapacityKg: 0, odometerKm: 0, acquisitionCost: 0, region: "", depotName: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,11 +35,8 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
   }, [vehicleToEdit]);
 
   const isValid =
-    formData.registrationNumber?.trim() &&
-    formData.nameModel?.trim() &&
-    formData.type &&
-    Number(formData.maxLoadCapacityKg) > 0 &&
-    Number(formData.acquisitionCost) > 0;
+    formData.registrationNumber?.trim() && formData.nameModel?.trim() &&
+    formData.type && Number(formData.maxLoadCapacityKg) > 0 && Number(formData.acquisitionCost) > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +48,10 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: ["maxLoadCapacityKg", "odometerKm", "acquisitionCost"].includes(name)
-        ? value === "" ? 0 : Number(value)
-        : value,
+        ? value === "" ? 0 : Number(value) : value,
     }));
   };
 
@@ -84,8 +72,7 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
       )}
 
       <form onSubmit={handleSubmit}>
-        {/* Row 1 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
           <div>
             <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Registration Number</label>
             <input
@@ -111,8 +98,7 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
           </div>
         </div>
 
-        {/* Row 2 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
           <div>
             <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Vehicle Type</label>
             <select
@@ -154,8 +140,7 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
           </div>
         </div>
 
-        {/* Row 3 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 24 }}>
           <div>
             <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Current Odometer (km)</label>
             <input
@@ -208,7 +193,7 @@ export default function VehicleForm({ vehicleToEdit, onSave, onClear, error }: V
             className="app-button"
             style={{ opacity: (!isValid || isSubmitting) ? 0.5 : 1, cursor: (!isValid || isSubmitting) ? "not-allowed" : "pointer" }}
           >
-            {isSubmitting ? "Saving..." : "Save Vehicle"}
+            {isSubmitting ? "Saving..." : vehicleToEdit ? "Update Vehicle" : "Register Vehicle"}
           </button>
         </div>
       </form>

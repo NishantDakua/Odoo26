@@ -1,102 +1,157 @@
-// todo: settings page
-export default function SettingsPage() {
-  return <div className="p-6"><h1 className="text-xl font-semibold text-gray-800">Settings</h1><p className="text-gray-500 mt-2">Coming soon.</p></div>;
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const SECTIONS = [
-  {
-    title: 'Account',
-    items: [
-      { label: 'Full Name', value: 'Managed by administrator', readonly: true },
-      { label: 'Email', value: 'Managed by administrator', readonly: true },
-      { label: 'Role', value: 'Safety Officer', readonly: true },
-    ],
-  },
-  {
-    title: 'Security',
-    items: [
-      { label: 'Account Lock Threshold', value: '5 failed attempts', readonly: true },
-      { label: 'Lock Duration', value: '30 minutes', readonly: true },
-      { label: 'Session Duration', value: '24 hours (or 30 days with Remember Me)', readonly: true },
-    ],
-  },
-  {
-    title: 'Driver Safety',
-    items: [
-      { label: 'Safety Score Range', value: '0 – 100', readonly: true },
-      { label: 'License Expiry Warning', value: '30 days before expiry', readonly: true },
-    ],
-  },
+const SECURITY_ITEMS = [
+  { label: 'Account Lock Threshold', value: '5 failed attempts' },
+  { label: 'Lock Duration',          value: '30 minutes' },
+  { label: 'Session Duration',       value: '24 hours (or 30 days with Remember Me)' },
+];
+
+const SAFETY_ITEMS = [
+  { label: 'Safety Score Range',    value: '0 – 100' },
+  { label: 'License Expiry Warning', value: '30 days before expiry' },
 ];
 
 export default function SettingsPage() {
-  const [passwordForm, setPasswordForm] = useState({ current: '', next: '', confirm: '' });
-  const [pwStatus, setPwStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [pwMessage, setPwMessage] = useState('');
+  // ── account info from server ──────────────────────────────────────────────
+  const [account, setAccount] = useState<{ name: string; email: string; role: string } | null>(null);
 
-  async function handlePasswordChange(e: React.FormEvent) {
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(j => {
+        if (j.success) {
+          const roleLabel: Record<string, string> = {
+            SAFETY_OFFICER:    'Safety Officer',
+            FLEET_MANAGER:     'Fleet Manager',
+            DISPATCHER:        'Dispatcher',
+            FINANCIAL_ANALYST: 'Financial Analyst',
+          };
+          setAccount({
+            name:  j.data.name,
+            email: j.data.email,
+            role:  roleLabel[j.data.role] ?? j.data.role,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const accountItems = [
+    { label: 'Full Name', value: account?.name  ?? '…' },
+    { label: 'Email',     value: account?.email ?? '…' },
+    { label: 'Role',      value: account?.role  ?? '…' },
+  ];
+
+  // ── password change ───────────────────────────────────────────────────────
+  const [form, setForm] = useState({ current: '', next: '', confirm: '' });
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault();
-    setPwStatus('idle');
-    setPwMessage('');
+    setStatus('idle');
+    setMessage('');
 
-    if (passwordForm.next !== passwordForm.confirm) {
-      setPwStatus('error');
-      setPwMessage('New passwords do not match.');
+    if (form.next !== form.confirm) {
+      setStatus('error');
+      setMessage('New passwords do not match.');
       return;
     }
-    if (passwordForm.next.length < 8) {
-      setPwStatus('error');
-      setPwMessage('New password must be at least 8 characters.');
+    if (form.next.length < 8) {
+      setStatus('error');
+      setMessage('New password must be at least 8 characters.');
       return;
     }
-
-    // Placeholder — password change API not yet implemented
-    setPwStatus('error');
-    setPwMessage('Password change endpoint is not yet available.');
+    // API not yet implemented — show a clear placeholder message
+    setStatus('error');
+    setMessage('Password change is not yet available. Contact your administrator to reset your password.');
   }
 
+  // ── shared styles ─────────────────────────────────────────────────────────
+  const card = 'rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-zinc-950 overflow-hidden';
+  const cardHeader = 'px-5 py-3 border-b border-black/[0.06] dark:border-white/[0.06]';
+  const inputCls = 'w-full h-10 px-3 rounded-lg text-sm text-zinc-900 dark:text-white bg-zinc-50 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white/20 transition-colors';
+
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-6 max-w-2xl">
+      {/* Page header */}
       <div>
-        <h1 className="text-[22px] font-semibold tracking-tight text-zinc-900 dark:text-white">Settings</h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">System configuration and account settings.</p>
+        <p className="text-[11px] font-semibold tracking-[0.08em] uppercase text-zinc-400 dark:text-white/40 mb-1">
+          Configuration
+        </p>
+        <h1 className="text-[26px] font-bold tracking-tight text-zinc-900 dark:text-white">
+          Settings
+        </h1>
       </div>
 
-      {SECTIONS.map((section) => (
-        <div key={section.title} className="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-zinc-950 overflow-hidden">
-          <div className="px-5 py-3 border-b border-black/[0.06] dark:border-white/[0.06]">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">{section.title}</h2>
-          </div>
-          <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
-            {section.items.map((item) => (
-              <div key={item.label} className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">{item.label}</span>
-                <span className="text-sm text-zinc-900 dark:text-zinc-200">{item.value}</span>
-              </div>
-            ))}
-          </div>
+      {/* Account */}
+      <div className={card}>
+        <div className={cardHeader}>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Account</h2>
         </div>
-      ))}
+        <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
+          {accountItems.map(item => (
+            <div key={item.label} className="flex items-center justify-between px-5 py-3.5">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.label}</span>
+              <span className="text-sm text-zinc-900 dark:text-zinc-200">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Security config */}
+      <div className={card}>
+        <div className={cardHeader}>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Security</h2>
+        </div>
+        <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
+          {SECURITY_ITEMS.map(item => (
+            <div key={item.label} className="flex items-center justify-between px-5 py-3.5">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.label}</span>
+              <span className="text-sm text-zinc-900 dark:text-zinc-200">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Driver safety */}
+      <div className={card}>
+        <div className={cardHeader}>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Driver Safety</h2>
+        </div>
+        <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
+          {SAFETY_ITEMS.map(item => (
+            <div key={item.label} className="flex items-center justify-between px-5 py-3.5">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.label}</span>
+              <span className="text-sm text-zinc-900 dark:text-zinc-200">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Change Password */}
-      <div className="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-zinc-950 overflow-hidden">
-        <div className="px-5 py-3 border-b border-black/[0.06] dark:border-white/[0.06]">
+      <div className={card}>
+        <div className={`${cardHeader} flex items-center justify-between`}>
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Change Password</h2>
+          <span className="text-[11px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/[0.06] text-zinc-400 dark:text-white/40 border border-zinc-200 dark:border-white/[0.08]">
+            Not yet available
+          </span>
         </div>
         <form onSubmit={handlePasswordChange} className="p-5 space-y-4">
-          {pwStatus === 'error' && (
+          {status === 'error' && (
             <div className="rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">
-              {pwMessage}
+              {message}
             </div>
           )}
-          {pwStatus === 'success' && (
+          {status === 'success' && (
             <div className="rounded-lg bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 px-4 py-2.5 text-sm text-green-600 dark:text-green-400">
-              {pwMessage}
+              {message}
             </div>
           )}
-          {(['current', 'next', 'confirm'] as const).map((field) => (
+
+          {(['current', 'next', 'confirm'] as const).map(field => (
             <div key={field} className="space-y-1.5">
               <label htmlFor={field} className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 {field === 'current' ? 'Current Password' : field === 'next' ? 'New Password' : 'Confirm New Password'}
@@ -104,18 +159,16 @@ export default function SettingsPage() {
               <input
                 id={field}
                 type="password"
-                value={passwordForm[field]}
-                onChange={(e) => setPasswordForm((p) => ({ ...p, [field]: e.target.value }))}
+                value={form[field]}
+                onChange={e => setForm(p => ({ ...p, [field]: e.target.value }))}
                 required
-                className="w-full h-10 px-3 rounded-lg text-sm text-zinc-900 dark:text-white bg-zinc-50 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white/20 transition-colors"
+                className={inputCls}
               />
             </div>
           ))}
+
           <div className="flex justify-end pt-1">
-            <button
-              type="submit"
-              className="h-9 px-4 rounded-lg text-sm font-medium bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
-            >
+            <button type="submit" className="h-9 px-4 rounded-lg text-sm font-medium bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
               Update Password
             </button>
           </div>

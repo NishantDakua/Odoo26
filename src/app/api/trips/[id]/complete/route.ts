@@ -1,1 +1,5 @@
-// todo: trip complete api
+import { NextResponse } from "next/server";
+
+export async function POST() {
+  return NextResponse.json({ message: "Trip complete API - coming soon" });
+}

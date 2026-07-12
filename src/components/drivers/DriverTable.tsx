@@ -310,8 +310,6 @@ export default function DriverTable() {
         )}
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-
       {showForm && <DriverForm driver={editDriver} onClose={closeForm} onSaved={onSaved} />}
       {deleteDriver && <DeleteDriverDialog driver={deleteDriver} onClose={() => setDeleteDriver(null)} onDeleted={onDeleted} />}
     </>

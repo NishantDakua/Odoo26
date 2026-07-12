@@ -318,3 +318,146 @@ body {
   font-family: 'SF Mono', 'Roboto Mono', 'Fira Code', monospace;
   font-size: 0.9em;
 }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Shared UI Classes (Fleet / Maintenance modules) ────────────────────── */
+
+.app-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.app-card-header {
+  margin-bottom: 18px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.input-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.input-field {
+  width: 100%;
+  padding: 8px 11px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.input-field:focus {
+  border-color: var(--input-focus);
+}
+
+.select-field {
+  appearance: none;
+  cursor: pointer;
+}
+
+.error-message {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--status-red-bg);
+  border: 1px solid var(--status-red-border);
+  color: var(--status-red-text);
+  margin-bottom: 16px;
+}
+
+/* ─── App Table ──────────────────────────────────────────────────────────── */
+
+.app-table-wrapper {
+  overflow-x: auto;
+}
+
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.app-table thead tr.table-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--input-bg);
+}
+
+.app-table thead th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.app-table tbody tr.table-row {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.1s;
+}
+
+.app-table tbody tr.table-row:hover {
+  background: var(--input-bg);
+}
+
+.app-table tbody td {
+  padding: 10px 16px;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+/* ─── Status Badges (Fleet / Maintenance) ────────────────────────────────── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-green  { background: var(--status-green-bg);  border-color: var(--status-green-border);  color: var(--status-green-text); }
+.status-green  .status-dot { background: var(--status-green-text); }
+.status-blue   { background: var(--status-blue-bg);   border-color: var(--status-blue-border);   color: var(--status-blue-text); }
+.status-blue   .status-dot { background: var(--status-blue-text); }
+.status-amber  { background: var(--status-amber-bg);  border-color: var(--status-amber-border);  color: var(--status-amber-text); }
+.status-amber  .status-dot { background: var(--status-amber-text); }
+.status-red    { background: var(--status-red-bg);    border-color: var(--status-red-border);    color: var(--status-red-text); }
+.status-red    .status-dot { background: var(--status-red-text); }
