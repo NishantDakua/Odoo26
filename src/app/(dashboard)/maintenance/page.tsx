@@ -68,7 +68,6 @@ export default function MaintenancePage() {
         <button
           onClick={() => setShowForm(!showForm)}
           className="app-button"
-          style={{ display: "flex", alignItems: "center", gap: "6px" }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -94,11 +93,11 @@ export default function MaintenancePage() {
               Are you sure you want to close this maintenance record for{" "}
               <strong>{logToClose?.vehicle?.registrationNumber}</strong>?
             </p>
-            <p style={{ fontSize: "0.875rem", color: "#9ca3af", marginTop: "0.5rem" }}>
+            <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginTop: "8px" }}>
               The vehicle will be marked as AVAILABLE (unless retired).
             </p>
             {closeError && (
-              <p style={{ color: "#ef4444", marginTop: "1rem", fontSize: "0.875rem", background: "#fee2e2", padding: "0.5rem", borderRadius: "0.25rem" }}>
+              <p style={{ color: "var(--status-retired-text)", marginTop: "16px", fontSize: "14px", backgroundColor: "var(--status-retired-bg)", padding: "8px", borderRadius: "8px" }}>
                 {closeError}
               </p>
             )}

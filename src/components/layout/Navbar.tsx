@@ -23,20 +23,7 @@ export default function Navbar() {
     )?.[1] ?? ["TransitOps"];
 
   return (
-    <header style={{
-      height: "56px",
-      background: "var(--bg-navbar)",
-      borderBottom: "1px solid var(--border)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 24px",
-      position: "sticky",
-      top: 0,
-      zIndex: 10,
-      flexShrink: 0,
-    }}>
-
+    <header className="navbar">
       {/* Breadcrumb */}
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {crumbs.map((crumb, i) => (
@@ -73,7 +60,7 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Search..."
-            className="input-field"
+            className="input"
             style={{
               padding: "6px 12px 6px 32px",
               width: "192px",
@@ -82,7 +69,7 @@ export default function Navbar() {
         </div>
 
         {/* Divider */}
-        <div style={{ width: "1px", height: "20px", background: "var(--border)" }} />
+        <div style={{ width: "1px", height: "20px", backgroundColor: "var(--border)" }} />
         
         {/* Theme Toggle */}
         <ThemeToggle />
@@ -97,18 +84,8 @@ export default function Navbar() {
           width: "30px",
           height: "30px",
           borderRadius: "50%",
-          background: "var(--border)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          fontSize: "11px",
-          fontWeight: 600,
-          color: "var(--text-primary)",
-          letterSpacing: "0.03em",
-        }}>
-          FM
-        </div>
+          backgroundColor: "var(--border)",
+        }} />
       </div>
     </header>
   );

@@ -5,28 +5,31 @@ import { createContext, useContext, useEffect, useState } from "react";
 type Theme = "light" | "dark";
 
 type ThemeContextType = {
-  theme: Theme;
+  theme: Theme | null; // null during SSR to avoid hydration mismatch on icons
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    // Determine initial theme (prefers-color-scheme or localStorage)
-    const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") {
-      setTheme(stored);
-      if (stored === "dark") document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setTheme(prefersDark ? "dark" : "light");
-      if (prefersDark) document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-    }
+    // Read the class that was injected synchronously by layout.tsx script
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
+
+    // Listen for OS theme changes
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const listener = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("theme")) {
+        setTheme(e.matches ? "dark" : "light");
+        if (e.matches) document.documentElement.classList.add("dark");
+        else document.documentElement.classList.remove("dark");
+      }
+    };
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
   }, []);
 
   const toggleTheme = () => {

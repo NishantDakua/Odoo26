@@ -56,32 +56,30 @@ export default function MaintenanceForm({ onSave, error }: MaintenanceFormProps)
   };
 
   return (
-    <div className="app-card">
+    <div className="card">
       {/* Header */}
-      <div className="app-card-header">
-        <h3 className="section-title">
-          Log Service
-        </h3>
-        <p style={{ color: "var(--text-muted)", fontSize: "13px" }}>
+      <div className="card-header">
+        Log Service
+        <div style={{ color: "var(--text-muted)", fontSize: "13px", fontWeight: 400, marginTop: "4px" }}>
           Only available vehicles can be serviced.
-        </p>
+        </div>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="error-message">
+        <div style={{ padding: "12px", backgroundColor: "var(--status-retired-bg)", color: "var(--status-retired-text)", borderRadius: "8px", marginBottom: "16px", fontSize: "13px" }}>
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div>
-          <label className="input-label">Vehicle</label>
+          <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Vehicle</label>
           <select
             name="vehicleId"
             value={formData.vehicleId}
             onChange={handleChange}
-            className="input-field select-field"
+            className="input"
           >
             <option value="">Select vehicle…</option>
             {vehicles.map((v) => (
@@ -98,19 +96,19 @@ export default function MaintenanceForm({ onSave, error }: MaintenanceFormProps)
         </div>
 
         <div>
-          <label className="input-label">Service Type</label>
+          <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Service Type</label>
           <input
             name="serviceType"
             value={formData.serviceType}
             onChange={handleChange}
             placeholder="e.g. Oil change"
-            className="input-field"
+            className="input"
           />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
           <div>
-            <label className="input-label">Cost (₹)</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Cost (₹)</label>
             <input
               type="number"
               name="cost"
@@ -118,45 +116,47 @@ export default function MaintenanceForm({ onSave, error }: MaintenanceFormProps)
               onChange={handleChange}
               min={1}
               placeholder="0"
-              className="input-field"
+              className="input"
             />
           </div>
           <div>
-            <label className="input-label">Service Date</label>
+            <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Service Date</label>
             <input
               type="date"
               name="serviceDate"
               value={formData.serviceDate}
               onChange={handleChange}
-              className="input-field"
-              style={{ colorScheme: "dark" }}
+              className="input"
+              // In dark mode we need color-scheme dark so the calendar picker is dark. 
+              // Usually setting it on body in CSS is enough, but to be safe:
+              style={{ colorScheme: "dark light" }}
             />
           </div>
         </div>
 
         <div>
-          <label className="input-label">Notes</label>
+          <label style={{ display: "block", fontSize: "12px", color: "var(--text-secondary)", marginBottom: "6px" }}>Notes</label>
           <textarea
             name="notes"
             value={formData.notes}
             onChange={handleChange}
             rows={3}
             placeholder="Optional service notes…"
-            className="input-field"
+            className="input"
             style={{
               resize: "vertical",
               lineHeight: "1.5",
+              fontFamily: "inherit",
             }}
           />
         </div>
 
-        {/* Actions */}
-        <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", borderTop: "1px solid var(--border)", paddingTop: "16px", marginTop: "8px" }}>
           <button
             type="button"
             onClick={handleClear}
+            disabled={isSubmitting}
             className="app-button-secondary"
-            style={{ flex: 1 }}
           >
             Clear
           </button>
@@ -164,9 +164,9 @@ export default function MaintenanceForm({ onSave, error }: MaintenanceFormProps)
             type="submit"
             disabled={!isValid || isSubmitting}
             className="app-button"
-            style={{ flex: 2 }}
+            style={{ opacity: (!isValid || isSubmitting) ? 0.5 : 1, cursor: (!isValid || isSubmitting) ? "not-allowed" : "pointer" }}
           >
-            {isSubmitting ? "Saving…" : "Save Record"}
+            {isSubmitting ? "Saving..." : "Save Record"}
           </button>
         </div>
       </form>

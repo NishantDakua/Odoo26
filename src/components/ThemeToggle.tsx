@@ -15,8 +15,10 @@ export default function ThemeToggle() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "transparent",
-        color: "var(--text-muted)",
+        backgroundColor: "transparent",
+        color: "var(--text-secondary)",
+        border: "none",
+        cursor: "pointer",
         transition: "color 0.15s, background-color 0.15s",
       }}
       className="theme-toggle-btn"
@@ -24,11 +26,15 @@ export default function ThemeToggle() {
     >
       <style>{`
         .theme-toggle-btn:hover {
-          background: var(--input-bg);
+          background-color: var(--button-hover) !important;
           color: var(--text-primary) !important;
         }
       `}</style>
-      {theme === "dark" ? (
+      
+      {/* Hide until hydration to prevent flash of wrong icon */}
+      {theme === null ? (
+        <div style={{ width: 16, height: 16 }} />
+      ) : theme === "dark" ? (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>

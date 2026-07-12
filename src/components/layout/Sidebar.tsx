@@ -7,6 +7,7 @@ type NavItem = { label: string; href: string };
 
 const navItems: NavItem[] = [
   { label: "Dashboard",     href: "/dashboard" },
+  { label: "Operations",    href: "/operations" },
   { label: "Fleet",         href: "/fleet" },
   { label: "Drivers",       href: "/drivers" },
   { label: "Trips",         href: "/trips" },
@@ -22,17 +23,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside style={{
-      width: "216px",
-      minWidth: "216px",
-      background: "var(--bg-sidebar)",
-      borderRight: "1px solid var(--border)",
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-      position: "sticky",
-      top: 0,
-    }}>
+    <aside className="sidebar">
 
       {/* Wordmark */}
       <div style={{
@@ -43,8 +34,8 @@ export default function Sidebar() {
           <div style={{
             width: "24px",
             height: "24px",
-            background: "var(--btn-primary-bg)",
-            border: "1px solid var(--btn-primary-border)",
+            backgroundColor: "var(--button)",
+            border: "1px solid var(--button-border)",
             borderRadius: "6px",
             display: "flex",
             alignItems: "center",
@@ -52,7 +43,7 @@ export default function Sidebar() {
             flexShrink: 0,
           }}>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M2 8L4.5 3L7 8L9.5 5" stroke="var(--btn-primary-text)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 8L4.5 3L7 8L9.5 5" stroke="var(--text-primary)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <span style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: "13.5px", letterSpacing: "-0.02em" }}>
@@ -62,7 +53,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav style={{ flex: 1, padding: "16px 12px", display: "flex", flexDirection: "column", gap: "2px" }}>
+      <nav style={{ flex: 1, padding: "16px 0", display: "flex", flexDirection: "column", gap: "2px", overflowY: "auto" }}>
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -73,24 +64,13 @@ export default function Sidebar() {
               {DIVIDER_BEFORE.has(item.href) && (
                 <div style={{
                   height: "1px",
-                  background: "var(--border)",
-                  margin: "8px 4px",
+                  backgroundColor: "var(--border)",
+                  margin: "8px 16px",
                 }} />
               )}
               <Link
                 href={item.href}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "7px 12px",
-                  borderRadius: "6px",
-                  fontSize: "13px",
-                  fontWeight: isActive ? 500 : 400,
-                  color: isActive ? "var(--text-primary)" : "var(--text-muted)",
-                  background: isActive ? "var(--input-bg)" : "transparent",
-                  transition: "color 0.1s, background 0.1s",
-                  letterSpacing: "-0.01em",
-                }}
+                className={`sidebar-item${isActive ? " sidebar-active" : ""}`}
               >
                 {item.label}
               </Link>
@@ -101,12 +81,18 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div style={{
-        padding: "14px 20px",
+        padding: "16px 20px",
         borderTop: "1px solid var(--border)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
       }}>
-        <div style={{ fontSize: "11px", color: "var(--text-muted)", letterSpacing: "0.01em" }}>
-          v1.0 · Fleet Manager
-        </div>
+        <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 500 }}>
+          TransitOps v1.2
+        </span>
+        <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+          Enterprise Fleet Management
+        </span>
       </div>
     </aside>
   );
