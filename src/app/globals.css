@@ -2,19 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design Tokens via CSS Variables ─────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  --bg-page:    #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --bg-navbar:  #FFFFFF;
+  --bg-card:    #FAFAFA;
+  --border:          rgba(0, 0, 0, 0.08);
+  --border-subtle:   rgba(0, 0, 0, 0.04);
+  --text-primary:    #1D1D1F;
+  --text-secondary:  #636366;
+  --text-muted:      rgba(0, 0, 0, 0.4);
+  --input-bg:        #F7F7F8;
+  --input-border:    rgba(0, 0, 0, 0.06);
+  --input-focus:     rgba(0, 0, 0, 0.15);
+  --input-hover:     rgba(0, 0, 0, 0.04);
+  --btn-primary-bg:     #F4F4F5;
+  --btn-primary-border: rgba(0, 0, 0, 0.08);
+  --btn-primary-text:   #1D1D1F;
+  --btn-primary-hover:  rgba(0, 0, 0, 0.04);
+  --btn-secondary-bg:     #FFFFFF;
+  --btn-secondary-border: rgba(0, 0, 0, 0.08);
+  --btn-secondary-text:   #1D1D1F;
+  --btn-secondary-hover:  #F4F4F5;
+  --status-green-bg:     rgba(34, 197, 94, 0.08);
+  --status-green-border: rgba(34, 197, 94, 0.16);
+  --status-green-text:   #16a34a;
+  --status-blue-bg:      rgba(59, 130, 246, 0.08);
+  --status-blue-border:  rgba(59, 130, 246, 0.16);
+  --status-blue-text:    #2563eb;
+  --status-amber-bg:     rgba(245, 158, 11, 0.08);
+  --status-amber-border: rgba(245, 158, 11, 0.16);
+  --status-amber-text:   #d97706;
+  --status-red-bg:       rgba(239, 68, 68, 0.08);
+  --status-red-border:   rgba(239, 68, 68, 0.16);
+  --status-red-text:     #dc2626;
+  --pill-bg:     rgba(0, 0, 0, 0.04);
+  --pill-border: rgba(0, 0, 0, 0.08);
+  --pill-text:   rgba(0, 0, 0, 0.6);
+  --table-hover: rgba(0, 0, 0, 0.02);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --bg-page:    #0a0a0a;
+  --bg-sidebar: #0a0a0a;
+  --bg-navbar:  #0a0a0a;
+  --bg-card:    #111111;
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted:     rgba(255, 255, 255, 0.35);
+  --input-bg:     rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.09);
+  --input-focus:  rgba(255, 255, 255, 0.18);
+  --input-hover:  rgba(255, 255, 255, 0.08);
+  --btn-primary-bg:     rgba(255, 255, 255, 0.09);
+  --btn-primary-border: rgba(255, 255, 255, 0.13);
+  --btn-primary-text:   #FFFFFF;
+  --btn-primary-hover:  rgba(255, 255, 255, 0.13);
+  --btn-secondary-bg:     transparent;
+  --btn-secondary-border: rgba(255, 255, 255, 0.12);
+  --btn-secondary-text:   #FFFFFF;
+  --btn-secondary-hover:  rgba(255, 255, 255, 0.05);
+  --status-green-bg:     rgba(34, 197, 94, 0.12);
+  --status-green-border: rgba(34, 197, 94, 0.2);
+  --status-green-text:   #4ADE80;
+  --status-blue-bg:      rgba(59, 130, 246, 0.12);
+  --status-blue-border:  rgba(59, 130, 246, 0.2);
+  --status-blue-text:    #60A5FA;
+  --status-amber-bg:     rgba(245, 158, 11, 0.12);
+  --status-amber-border: rgba(245, 158, 11, 0.2);
+  --status-amber-text:   #FBBF24;
+  --status-red-bg:       rgba(239, 68, 68, 0.12);
+  --status-red-border:   rgba(239, 68, 68, 0.2);
+  --status-red-text:     #F87171;
+  --pill-bg:     rgba(255, 255, 255, 0.06);
+  --pill-border: rgba(255, 255, 255, 0.09);
+  --pill-text:   rgba(255, 255, 255, 0.75);
+  --table-hover: rgba(255, 255, 255, 0.03);
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
+/* ─── Global Styles ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+a { text-decoration: none; color: inherit; }
+input, select, textarea, button { font-family: inherit; }
+button { border: none; cursor: pointer; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

@@ -1,0 +1,8 @@
+next
+react
+react-dom
+prisma
+@prisma/client
+typescript
+@types/node
+zod
